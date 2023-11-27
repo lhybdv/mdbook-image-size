@@ -1,9 +1,9 @@
 [package]
-name = "mdbook-imgsize"
+name = "mdbook-image-size"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["George Liu <39660787@qq.com>"]
 
 [dependencies]
 anyhow = "1.0.75"
@@ -11,3 +11,13 @@ clap = "4.4.8"
 mdbook = "0.4.35"
 serde_json = "1.0.108"
 semver = "1.0.20"
+pulldown-cmark = "0.9.3"
+regex = "1.10.2"
+
+[lib]
+name = "mdbook_image_size"
+path = "src/lib.rs"
+
+[[bin]]
+name = "mdbook-image-size"
+path = "src/bin/mdbook-image-size.rs"
