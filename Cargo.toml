@@ -3,6 +3,7 @@ name = "mdbook-image-size"
 version = "0.1.0"
 edition = "2021"
 authors = ["George Liu <39660787@qq.com>"]
+license = "MIT"
 repository = "https://github.com/lhybdv/mdbook-image-size.git"
 description = "A mdbook preprocessor which support image size syntax"
 
