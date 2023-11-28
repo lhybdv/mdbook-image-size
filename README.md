@@ -1,8 +1,10 @@
-# mdbook-image-size
+﻿# mdbook-image-size
 
 A mdbook preprocessor which support image size syntax
 
-## width & height
+## syntax
+
+### width & height
 
 From
 
@@ -16,7 +18,7 @@ To
 <img src="path/to/your/image" alt="the alt" title="the title" width="500" height="400">
 ```
 
-## width only
+### width only
 
 From
 
@@ -30,7 +32,7 @@ To
 <img src="path/to/your/image" alt="the alt" title="the title" width="500"> 
 ```
 
-## height only
+### height only
 
 From
 
@@ -43,4 +45,12 @@ To
 ```html
 <img src="path/to/your/image" alt="the alt" title="the title" height="400">
 ```
-TIP: No alt and title is ok.
+
+TIP: No alt or title is ok.
+
+
+## Installation
+
+```sh
+cargo install mdbook-image-size
+```
