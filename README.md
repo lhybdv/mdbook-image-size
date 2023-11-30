@@ -46,7 +46,8 @@ To
 <img src="path/to/your/image" alt="the alt" title="the title" height="400">
 ```
 
-TIP: No alt or title is ok.
+> [!TIP]
+> No alt or title is ok.
 
 
 ## Installation
