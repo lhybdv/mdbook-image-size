@@ -51,6 +51,16 @@ TIP: No alt or title is ok.
 
 ## Installation
 
+cargo
+
 ```sh
 cargo install mdbook-image-size
+```
+
+homebrew
+
+```sh
+ brew tap lhybdv/homebrew-mdbook-image-size https://github.com/lhybdv/homebrew-mdbook-image-size.git
+
+ brew install mdbook-image-size
 ```
