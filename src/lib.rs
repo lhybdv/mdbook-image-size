@@ -1,3 +1,4 @@
+mod markdown;
 mod preprocessor;
 mod types;
 
