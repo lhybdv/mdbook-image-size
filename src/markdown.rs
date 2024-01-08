@@ -56,7 +56,7 @@ pub fn preprocess(content: &str) -> MdbookResult<String> {
             let (width, width_attr) = get_name_attr(&caps, "width");
             let (height, height_attr) = get_name_attr(&caps, "height");
 
-            if width == "" && height == "" {
+            if width.is_empty() && height.is_empty() {
                 alt = "";
                 state = State::None;
                 continue;
@@ -69,7 +69,7 @@ pub fn preprocess(content: &str) -> MdbookResult<String> {
                 width_attr,
                 height_attr);
             
-            image_blocks.push((span_start..span.start+&caps[0].len(), img));
+            image_blocks.push((span_start..span.start+caps[0].len(), img));
             alt = "";
             state = State::None;
             continue;
@@ -87,9 +87,10 @@ pub fn preprocess(content: &str) -> MdbookResult<String> {
 }
 
 fn get_attr<'a>(attr: &str, name: &str) -> Cow<'a, str> {
-    match attr {
-        "" => "".into(),
-        _ => format!(" {}=\"{}\"", name, attr).into(),
+    if attr.is_empty() {
+        "".into()
+    } else {
+        format!(" {}=\"{}\"", name, attr).into()
     }
 }
 
