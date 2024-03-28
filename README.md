@@ -49,19 +49,16 @@ To
 > [!TIP]
 > No alt or title is ok.
 
-
 ## Installation
-
-cargo
 
 ```sh
 cargo install mdbook-image-size
 ```
 
-homebrew
+add it as a preprocessor in book.toml
 
-```sh
- brew tap lhybdv/homebrew-mdbook-image-size https://github.com/lhybdv/homebrew-mdbook-image-size.git
-
- brew install mdbook-image-size
+```toml
+[preprocessor.image-size]
+command = "mdbook-image-size"
 ```
+
