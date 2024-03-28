@@ -1,7 +1,7 @@
-use mdbook_image_size::ImageSize;
 use clap::{Arg, ArgMatches, Command};
 use mdbook::errors::Error;
 use mdbook::preprocess::{CmdPreprocessor, Preprocessor};
+use mdbook_image_size::ImageSize;
 use semver::{Version, VersionReq};
 use std::io;
 use std::process;

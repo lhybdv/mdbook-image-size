@@ -1,13 +1,14 @@
 use std::borrow::Cow;
 
-use mdbook::errors::Result as MdbookResult;
-use pulldown_cmark::{Event, Parser, CowStr};
 use crate::types::State;
-use regex::{Regex, Captures};
+use mdbook::errors::Result as MdbookResult;
 use once_cell::sync::Lazy;
+use pulldown_cmark::{CowStr, Event, Parser};
+use regex::{Captures, Regex};
 
 static RE_IMAGE: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"\((?<url>\S+)\s+("(?<title>.+)"\s+)?=(?<width>\d+)?x(?<height>\d+)?\s*\)"#).unwrap()
+    Regex::new(r#"\((?<url>\S+)\s+("(?<title>.+)"\s+)?=(?<width>\d+)?x(?<height>\d+)?\s*\)"#)
+        .unwrap()
 });
 
 pub fn preprocess(content: &str) -> MdbookResult<String> {
@@ -16,11 +17,13 @@ pub fn preprocess(content: &str) -> MdbookResult<String> {
     let mut state = State::None;
     let mut span_start = 0;
 
-    let text_events = Parser::new(content).into_offset_iter()
-        .filter_map(|(event, span)| match event {
-            Event::Text(CowStr::Borrowed(text)) => Some((text, span)),
-            _ => None,
-        });
+    let text_events =
+        Parser::new(content)
+            .into_offset_iter()
+            .filter_map(|(event, span)| match event {
+                Event::Text(CowStr::Borrowed(text)) => Some((text, span)),
+                _ => None,
+            });
 
     for (text, span) in text_events {
         if text == "![" {
@@ -32,8 +35,7 @@ pub fn preprocess(content: &str) -> MdbookResult<String> {
                 state = State::Start;
                 continue;
             }
-        }
-        else if text == "]" {
+        } else if text == "]" {
             if let State::Start = state {
                 state = State::AltClose;
             } else {
@@ -49,9 +51,9 @@ pub fn preprocess(content: &str) -> MdbookResult<String> {
                 state = State::None;
                 continue;
             };
-            
+
             let alt_attr = get_attr(alt, "alt");
-            
+
             let (_, title_attr) = get_name_attr(&caps, "title");
             let (width, width_attr) = get_name_attr(&caps, "width");
             let (height, height_attr) = get_name_attr(&caps, "height");
@@ -62,22 +64,20 @@ pub fn preprocess(content: &str) -> MdbookResult<String> {
                 continue;
             }
 
-            let img = format!("<img src=\"{}\"{}{}{}{}>",
-                &caps["url"],
-                alt_attr,
-                title_attr,
-                width_attr,
-                height_attr);
-            
-            image_blocks.push((span_start..span.start+caps[0].len(), img));
+            let img = format!(
+                "<img src=\"{}\"{}{}{}{}>",
+                &caps["url"], alt_attr, title_attr, width_attr, height_attr
+            );
+
+            image_blocks.push((span_start..span.start + caps[0].len(), img));
             alt = "";
             state = State::None;
             continue;
         }
     }
-    
+
     let mut content = content.to_string();
-    for(span, img) in image_blocks.iter().rev() {
+    for (span, img) in image_blocks.iter().rev() {
         let pre_content = &content[..span.start];
         let post_content = &content[span.end..];
         content = format!("{}{}{}", pre_content, img, post_content);
@@ -94,16 +94,14 @@ fn get_attr<'a>(attr: &str, name: &str) -> Cow<'a, str> {
     }
 }
 
-fn get_name_attr<'a>(caps: &'a Captures, name: &'a str) 
-    -> (&'a str, Cow<'a, str>) 
-{
-    let attr_v= caps.name(name).map_or("", |m| m.as_str());
+fn get_name_attr<'a>(caps: &'a Captures, name: &'a str) -> (&'a str, Cow<'a, str>) {
+    let attr_v = caps.name(name).map_or("", |m| m.as_str());
     (attr_v, get_attr(attr_v, name))
 }
 
 #[cfg(test)]
 mod test {
-    use super::*; 
+    use super::*;
 
     #[test]
     fn preprocess_width_height() {
@@ -116,13 +114,19 @@ mod test {
     fn preprocess_width() {
         let content = "# Chapter 1\n// \nfoo ![](images/2023-11-25-11-46-17.png =800x) bar";
         let result = preprocess(content).unwrap();
-        assert_eq!(result, "# Chapter 1\n// \nfoo <img src=\"images/2023-11-25-11-46-17.png\" width=\"800\"> bar");
+        assert_eq!(
+            result,
+            "# Chapter 1\n// \nfoo <img src=\"images/2023-11-25-11-46-17.png\" width=\"800\"> bar"
+        );
     }
 
     #[test]
     fn preprocess_height() {
         let content = "# Chapter 1\n// \nfoo ![](images/2023-11-25-11-46-17.png =x400) bar";
         let result = preprocess(content).unwrap();
-        assert_eq!(result, "# Chapter 1\n// \nfoo <img src=\"images/2023-11-25-11-46-17.png\" height=\"400\"> bar");
+        assert_eq!(
+            result,
+            "# Chapter 1\n// \nfoo <img src=\"images/2023-11-25-11-46-17.png\" height=\"400\"> bar"
+        );
     }
 }

@@ -1,5 +1,5 @@
-use mdbook::errors::Error;
 use mdbook::book::Book;
+use mdbook::errors::Error;
 use mdbook::preprocess::{Preprocessor, PreprocessorContext};
 
 use crate::markdown::preprocess;
@@ -19,13 +19,12 @@ impl Preprocessor for ImageSize {
         "image-size-preprocessor"
     }
 
-    fn run(&self, _ctx: &PreprocessorContext, mut book: Book) 
-        -> Result<Book, Error> 
-    {
+    fn run(&self, _ctx: &PreprocessorContext, mut book: Book) -> Result<Book, Error> {
         book.for_each_mut(|item| {
             if let mdbook::BookItem::Chapter(chapter) = item {
-                let _ = preprocess(&chapter.content)
-                    .map(|c| { chapter.content = c; });
+                let _ = preprocess(&chapter.content).map(|c| {
+                    chapter.content = c;
+                });
             }
         });
 
