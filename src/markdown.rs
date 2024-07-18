@@ -7,7 +7,7 @@ use pulldown_cmark::{CowStr, Event, Parser};
 use regex::{Captures, Regex};
 
 static RE_IMAGE: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"\((?<url>\S+)\s+("(?<title>.+)"\s+)?=(?<width>\d+)?x(?<height>\d+)?\s*\)"#)
+    Regex::new(r#"\((?<url>\S+)\s+("(?<title>.+)"\s+)?=(?<width>\d+)?x(?<height>\d+)?(?<align>\s+\w+)?\s*\)"#)
         .unwrap()
 });
 
@@ -64,9 +64,17 @@ pub fn preprocess(content: &str) -> MdbookResult<String> {
                 continue;
             }
 
+            let (align, _) = get_name_attr(&caps, "align");
+            
+            let align_style = match align {
+                center if center.trim().to_lowercase() == "center" => " style=\"text-align:center\"",
+                right if right.trim().to_lowercase() == "right" => " style=\"text-align:right\"",
+                _ => ""
+            };
+
             let img = format!(
-                "<img src=\"{}\"{}{}{}{}>",
-                &caps["url"], alt_attr, title_attr, width_attr, height_attr
+                "<p{}><img src=\"{}\"{}{}{}{}></p>",
+                align_style, &caps["url"], alt_attr, title_attr, width_attr, height_attr
             );
 
             image_blocks.push((span_start..span.start + caps[0].len(), img));
@@ -107,7 +115,7 @@ mod test {
     fn preprocess_width_height() {
         let content = "# Chapter 1\n// \nfoo ![](images/2023-11-25-11-46-17.png =800x400) bar";
         let result = preprocess(content).unwrap();
-        assert_eq!(result, "# Chapter 1\n// \nfoo <img src=\"images/2023-11-25-11-46-17.png\" width=\"800\" height=\"400\"> bar");
+        assert_eq!(result, "# Chapter 1\n// \nfoo <p><img src=\"images/2023-11-25-11-46-17.png\" width=\"800\" height=\"400\"></p> bar");
     }
 
     #[test]
@@ -116,7 +124,7 @@ mod test {
         let result = preprocess(content).unwrap();
         assert_eq!(
             result,
-            "# Chapter 1\n// \nfoo <img src=\"images/2023-11-25-11-46-17.png\" width=\"800\"> bar"
+            "# Chapter 1\n// \nfoo <p><img src=\"images/2023-11-25-11-46-17.png\" width=\"800\"></p> bar"
         );
     }
 
@@ -126,7 +134,28 @@ mod test {
         let result = preprocess(content).unwrap();
         assert_eq!(
             result,
-            "# Chapter 1\n// \nfoo <img src=\"images/2023-11-25-11-46-17.png\" height=\"400\"> bar"
+            "# Chapter 1\n// \nfoo <p><img src=\"images/2023-11-25-11-46-17.png\" height=\"400\"></p> bar"
         );
+    }
+
+    #[test]
+    fn preprocess_width_height_left() {
+        let content = "# Chapter 1\n// \nfoo ![](images/2023-11-25-11-46-17.png =800x400 left) bar";
+        let result = preprocess(content).unwrap();
+        assert_eq!(result, "# Chapter 1\n// \nfoo <p><img src=\"images/2023-11-25-11-46-17.png\" width=\"800\" height=\"400\"></p> bar");
+    }
+
+    #[test]
+    fn preprocess_width_height_center() {
+        let content = "# Chapter 1\n// \nfoo ![](images/2023-11-25-11-46-17.png =800x400 center) bar";
+        let result = preprocess(content).unwrap();
+        assert_eq!(result, "# Chapter 1\n// \nfoo <p style=\"text-align:center\"><img src=\"images/2023-11-25-11-46-17.png\" width=\"800\" height=\"400\"></p> bar");
+    }
+
+    #[test]
+    fn preprocess_width_height_right() {
+        let content = "# Chapter 1\n// \nfoo ![](images/2023-11-25-11-46-17.png =800x400 right) bar";
+        let result = preprocess(content).unwrap();
+        assert_eq!(result, "# Chapter 1\n// \nfoo <p style=\"text-align:right\"><img src=\"images/2023-11-25-11-46-17.png\" width=\"800\" height=\"400\"></p> bar");
     }
 }
