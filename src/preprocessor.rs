@@ -1,6 +1,6 @@
-use mdbook::book::Book;
-use mdbook::errors::Error;
-use mdbook::preprocess::{Preprocessor, PreprocessorContext};
+use mdbook_preprocessor::book::{Book, BookItem};
+use mdbook_preprocessor::errors::{Error, Result as MdbookResult};
+use mdbook_preprocessor::{Preprocessor, PreprocessorContext};
 
 use crate::markdown::preprocess;
 
@@ -21,7 +21,7 @@ impl Preprocessor for ImageSize {
 
     fn run(&self, _ctx: &PreprocessorContext, mut book: Book) -> Result<Book, Error> {
         book.for_each_mut(|item| {
-            if let mdbook::BookItem::Chapter(chapter) = item {
+            if let BookItem::Chapter(chapter) = item {
                 let _ = preprocess(&chapter.content).map(|c| {
                     chapter.content = c;
                 });
@@ -31,7 +31,7 @@ impl Preprocessor for ImageSize {
         Ok(book)
     }
 
-    fn supports_renderer(&self, renderer: &str) -> bool {
-        renderer != "not-supported"
+    fn supports_renderer(&self, renderer: &str) -> MdbookResult<bool> {
+        Ok(renderer != "not-supported")
     }
 }

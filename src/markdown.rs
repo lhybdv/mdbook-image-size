@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use crate::types::State;
-use mdbook::errors::Result as MdbookResult;
+use mdbook_preprocessor::errors::Result as MdbookResult;
 use once_cell::sync::Lazy;
 use pulldown_cmark::{CowStr, Event, Parser};
 use regex::{Captures, Regex};

@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased]
+## [Unreleased - 0.3.0]
+
+Updated mdbook to 0.5.2 and pulldown-cmark to 0.13.
 
 ## [0.2.0] - 2024-07-18
 
